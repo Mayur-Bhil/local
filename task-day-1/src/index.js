@@ -3,20 +3,30 @@ import express from "express";
 const app = express();
 const port  = 8080;
 const Tasks = [
-    {
-     id:"123",
-     title: "go to gym",       // required
-     description: "Daily should have top go gym", // optional
-     status: "pending",      // default: "pending", values: ["pending", "in-progress", "done"]
-     createdAt: new Date().getDate(),     // default: current date
-    },{
-     id:"3264",    
-     title: "Write Code",       // required
-     description: "Write Code For 3 hours daily", // optional
-     status: "pending",      // default: "pending", values: ["pending", "in-progress", "done"]
-     createdAt: new Date().getDate(),     //
-    }
-]
+     {
+    id: 1,
+    title: "Buy groceries",
+    description: "Milk, eggs, bread, and vegetables from supermarket",
+    status: "pending",
+    createdAt: "2025-09-02T18:45:00Z"
+  },
+  {
+    id: 2,
+    title: "Finish MERN project",
+    description: "Complete backend API and connect it with React frontend",
+    status: "in-progress",
+    createdAt: "2025-09-01T15:20:00Z"
+  },
+  {
+    id: 3,
+    title: "Workout session",
+    description: "Attend evening yoga class at 7 PM",
+    status: "completed",
+    createdAt: "2025-08-31T07:30:00Z"
+  }
+];
+
+
 app.use(express.json())
 
 
@@ -37,53 +47,59 @@ app.get("/task",(req,res)=>{
 })
 
 app.get("/task/:id",(req,res)=>{
-    const id  =  req.params.id;
-    console.log(id);
-   
-    const data = Tasks.filter((elem)=>{
-       return elem.id==id
+    const id = req.params.id;
+    const todos = Tasks.find((elem)=>elem.id == id);
+    console.log(todos);
+    res.json({
+        data : todos
     })
 
-    return res.json({
-        data
-    })
-    
 })
 
-
 app.post("/create",(req,res)=>{
-    const task  = req.body;
-
-    console.log(task);
+    const {title,description,status,id}  = req.body;
     
+    const newTodo = {
+        id:id,
+        title:title,
+        description:description,
+        status:status || pending,
+    }
+
+    Tasks.push();
     return res.json({
-        message :task
+        Data : newTodo
     })
 })
 
 app.delete("/delete/:id",(req,res)=>{
     const id =  req.params.id;
+    const indexTOremove = Tasks.find((el) => el.id == id);
     
-    const index = Tasks.splice(id);
-    console.log(index);
+    if(indexTOremove > -1){
+        return res.json("Not found");
+    }
+    const deletedItem =  Tasks.splice(indexTOremove,1);
+    res.json(deletedItem[0])
+
+    
     
 
 
 })
 
-app.get("/update/:id",(req,res)=>{
+app.put("/update/:id",(req,res)=>{
     const id = req.params.id;
-    // const {title,description,status,createdAt} = req.body;
+    const tasks = Tasks.find((el)=>el.id == id);
 
-    const data = Tasks.map((el)=>{
-        console.log(el);
-        if(Tasks[el.id] == id){
-            
-        }
-        
-    })
+    const {title,description,status} = req.body;
+    el.title = title 
+    el.description = description
+    el.status = status
+
+
+    res.send(tasks);
 })
-
 
 
 
