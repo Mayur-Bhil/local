@@ -1,29 +1,61 @@
-import express from "express";
+import e from "express";
+import express, { response } from "express";
 
 const app = express();
 const port  = 8080;
 const Tasks = [
      {
     id: 1,
-    title: "Buy groceries",
-    description: "Milk, eggs, bread, and vegetables from supermarket",
+    title: "go to gym",
+    description: "you should go gym daily",
     status: "pending",
-    createdAt: "2025-09-02T18:45:00Z"
+    createdAt: "2025-09-02T18:45:00Z",
+    deadline: "2025-09-30T17:00:00.000Z"
   },
   {
     id: 2,
     title: "Finish MERN project",
-    description: "Complete backend API and connect it with React frontend",
+    description: "Complete backend and integret frontend",
     status: "in-progress",
-    createdAt: "2025-09-01T15:20:00Z"
+    createdAt: "2025-09-01T15:20:00Z",
+    deadline: "2025-09-30T17:00:00.000Z"
   },
   {
     id: 3,
     title: "Workout session",
     description: "Attend evening yoga class at 7 PM",
     status: "completed",
-    createdAt: "2025-08-31T07:30:00Z"
-  }
+    createdAt: "2025-08-31T07:30:00Z",
+    deadline: "2025-09-30T17:00:00.000Z"
+
+  },
+  {
+    id: 4,
+    title: "Finish MERN project e",
+    description: "Complete backend and integret frontend",
+    status: "in-progress",
+    createdAt: "2025-09-01T15:20:00Z",
+    deadline: "2025-09-30T17:00:00.000Z"
+
+  },
+  {
+    id: 5,
+    title: "Finish MERN project",
+    description: "Complete backend and integret frontend",
+    status: "in-progress",
+    createdAt: "2025-09-01T15:20:00Z",
+    deadline: "2025-09-30T17:00:00.000Z"
+
+  },
+  {
+    id: 6,
+    title: "Finish MERN project 3",
+    description: "Complete backend and integret frontend with Gsap",
+    status: "completed",
+    createdAt: "2025-09-01T15:20:00Z",
+    deadline: "2025-09-30T17:00:00.000Z"
+
+  },
 ];
 
 
@@ -57,6 +89,7 @@ app.get("/task/:id",(req,res)=>{
 })
 
 app.post("/create",(req,res)=>{
+
     const {title,description,status,id}  = req.body;
     
     const newTodo = {
@@ -93,16 +126,98 @@ app.put("/update/:id",(req,res)=>{
     const tasks = Tasks.find((el)=>el.id == id);
 
     const {title,description,status} = req.body;
-    el.title = title 
-    el.description = description
-    el.status = status
+    tasks.title = title 
+    tasks.description = description
+    tasks.status = status
 
 
     res.send(tasks);
 })
 
 
+app.get("/search",(req,res)=>{
+    let query = req.query?.title;
+    console.log(query);
+    const filterdata = Tasks.filter(item=>{
+        console.log(item);
+        
+        const ans = item.title.toLowerCase().includes(query.toLowerCase())
+        
+        return ans;
+    })
 
+    if(filterdata.length === 0){
+        return res.json({
+            message : `No Data Found for this '${query}' Task`
+        })
+    }
+
+    return res.json({
+        data : filterdata 
+    });
+})
+
+
+
+
+app.patch("/tasks/:id",(req,res)=>{
+    const id = req.params.id;
+    const status = req.query.status;
+    console.log("id is ", id);
+    console.log(status);
+    
+    const TaskWithUpdatedStatus = Tasks.find((el)=>el.id == id)
+    console.log(status);
+
+
+      TaskWithUpdatedStatus.status = status
+
+
+    return res.json({
+       message : "Updated SuccessFully",
+       data:TaskWithUpdatedStatus
+    
+    })
+
+
+})
+
+app.get("/tasks",(req,res)=>{
+    const status = req.query.status;
+    // const arr = []
+
+
+    const filteredTasks = Tasks.filter((el) => el.status === status);
+    console.log(filteredTasks);
+
+    // for (let i = 0; i < Tasks.length; i++) {
+    //         if(Tasks[i].status === status){
+    //             arr.push(Tasks[i])
+    //         }  
+    // }
+
+    
+
+    return res.status(200).json({
+        message :`all the '${status}' tasks are`,
+        data:filteredTasks
+    })
+})
+
+
+app.get("/tasks/overdue",(req,res)=>{
+    const today = new Date();
+    console.log("Today's Data is ",today);
+    
+    const allTasks = Tasks.filter((el)=>{
+        const deadlineTaskDate = new Date(el.deadline);
+        return deadlineTaskDate < today
+    })
+    
+       return res.json({
+        tasks : allTasks
+    })
+})
 
 
 
