@@ -10,7 +10,7 @@ const Tasks = [
     description: "you should go gym daily",
     status: "pending",
     createdAt: "2025-09-02T18:45:00Z",
-    deadline: "2025-09-30T17:00:00.000Z"
+    deadline: "2025-09-09T17:00:00.000Z"
   },
   {
     id: 2,
@@ -18,7 +18,7 @@ const Tasks = [
     description: "Complete backend and integret frontend",
     status: "in-progress",
     createdAt: "2025-09-01T15:20:00Z",
-    deadline: "2025-09-30T17:00:00.000Z"
+    deadline: "2025-09-08T17:00:00.000Z"
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ const Tasks = [
     description: "Attend evening yoga class at 7 PM",
     status: "completed",
     createdAt: "2025-08-31T07:30:00Z",
-    deadline: "2025-09-30T17:00:00.000Z"
+    deadline: "2025-09-05T17:00:00.000Z"
 
   },
   {
@@ -35,7 +35,7 @@ const Tasks = [
     description: "Complete backend and integret frontend",
     status: "in-progress",
     createdAt: "2025-09-01T15:20:00Z",
-    deadline: "2025-09-30T17:00:00.000Z"
+    deadline: "2025-09-05T17:00:00.000Z"
 
   },
   {
@@ -44,7 +44,7 @@ const Tasks = [
     description: "Complete backend and integret frontend",
     status: "in-progress",
     createdAt: "2025-09-01T15:20:00Z",
-    deadline: "2025-09-30T17:00:00.000Z"
+    deadline: "2025-09-05T17:00:00.000Z"
 
   },
   {
@@ -53,7 +53,7 @@ const Tasks = [
     description: "Complete backend and integret frontend with Gsap",
     status: "completed",
     createdAt: "2025-09-01T15:20:00Z",
-    deadline: "2025-09-30T17:00:00.000Z"
+    deadline: "2025-09-05T17:00:00.000Z"
 
   },
 ];
@@ -141,7 +141,7 @@ app.get("/search",(req,res)=>{
     const filterdata = Tasks.filter(item=>{
         console.log(item);
         
-        const ans = item.title.toLowerCase().includes(query.toLowerCase())
+        const ans = item.title.toLowerCase().includes(query.toLowerCase())  || item.description.toLowerCase().includes(query.toLocaleLowerCase())
         
         return ans;
     })
