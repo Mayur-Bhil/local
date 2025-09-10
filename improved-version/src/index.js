@@ -1,32 +1,34 @@
-import express from "express"
+import express from "express";
+import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import taskRouter from "./routes/task.route.js";
 
-const app =  express();
-const PORT = 8080; 
-console.log("port ",PORT );
+// Load environment variables
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 8080;
 
 
-app.use(express.json())
-app.use("/tasks",taskRouter)
+app.use(express.json());
 
 
+app.use("/tasks", taskRouter);
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "Server is Up and running"
+  });
+});
 
-
-app.get("/",(req,res)=>{
-    return res.json({
-        message: "Server is Up and running"
-    })
-})
-
-
-
-
-
-
-
-connectDB();
-app.listen(PORT,()=>{
-        console.log(`App listening ON Port 8080`);
-})
+// Connect to DB and then start server
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error(" Failed to connect to MongoDB", err);
+    process.exit(1);
+  });
