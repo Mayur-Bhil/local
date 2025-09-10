@@ -3,7 +3,7 @@ import express, { response } from "express";
 
 const app = express();
 const port  = 8080;
-const Tasks = [
+let Tasks = [
      {
     id: 1,
     title: "go to gym",
@@ -18,7 +18,7 @@ const Tasks = [
     description: "Complete backend and integret frontend",
     status: "in-progress",
     createdAt: "2025-09-01T15:20:00Z",
-    deadline: "2025-09-08T17:00:00.000Z"
+    deadline: "09/08/25"
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ const Tasks = [
     description: "Attend evening yoga class at 7 PM",
     status: "completed",
     createdAt: "2025-08-31T07:30:00Z",
-    deadline: "2025-09-05T17:00:00.000Z"
+    deadline: "09/08/25"
 
   },
   {
@@ -44,7 +44,7 @@ const Tasks = [
     description: "Complete backend and integret frontend",
     status: "in-progress",
     createdAt: "2025-09-01T15:20:00Z",
-    deadline: "2025-09-05T17:00:00.000Z"
+    deadline: "Mon Sep 08 2025 14:19:24 GMT+0530 (India Standard Time)"
 
   },
   {
@@ -163,11 +163,11 @@ app.get("/search",(req,res)=>{
 app.patch("/tasks/:id",(req,res)=>{
     const id = req.params.id;
     const status = req.query.status;
-    console.log("id is ", id);
-    console.log(status);
+    // console.log("id is ", id);
+    // console.log(status);
     
     const TaskWithUpdatedStatus = Tasks.find((el)=>el.id == id)
-    console.log(status);
+    // console.log(status);
 
 
       TaskWithUpdatedStatus.status = status
@@ -207,7 +207,7 @@ app.get("/tasks",(req,res)=>{
 
 app.get("/tasks/overdue",(req,res)=>{
     const today = new Date();
-    console.log("Today's Data is ",today);
+    // console.log("Today's Data is ",today);
     
     const allTasks = Tasks.filter((el)=>{
         const deadlineTaskDate = new Date(el.deadline);
@@ -220,8 +220,48 @@ app.get("/tasks/overdue",(req,res)=>{
 })
 
 
+app.get("/tasks/getDeadline", (req, res) => {
+  const { sort } = req.query;
+  console.log(sort);
+  
 
+  let result = [...Tasks]; // copy so original array is safe
 
+  if (sort === "deadline") {
+    result.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+  }
+
+  res.json(result);
+});
+
+app.get("/tasks/get",(req,res)=>{
+    const date = req.query?.date;
+    console.log(date);
+    
+    // const today = new Date();
+    const TodaydeadlineTasks = Tasks.filter((e)=>e.deadline == date);
+    
+
+    console.log(TodaydeadlineTasks);
+    
+    res.json({data:TodaydeadlineTasks});
+
+})
+
+app.delete("/tasks/completed", (req, res) => {
+   
+    
+    const RemainingTasks = Tasks.filter(task => task.status == "completed");
+    Tasks = Tasks.filter(task => task.status !== "completed");
+
+   
+    
+    res.json({
+        message: `Deleted completed tasks`,
+        Tasks,
+        RemainingTasks
+    });
+});
 
 app.listen(port,()=>{
     console.log(`server is runnign on PORT ${port}`);
