@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import taskRouter from "./routes/task.route.js";
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
