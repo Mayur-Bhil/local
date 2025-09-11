@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import taskRouter from "./routes/task.route.js";
+import userRouter from "./routes/user.route.js";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 
 app.use("/tasks", taskRouter);
+app.use("/users",userRouter);
 
 app.get("/", (req, res) => {
   res.json({
