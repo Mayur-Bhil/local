@@ -4,6 +4,7 @@ import connectDB from "./config/db.js";
 import taskRouter from "./routes/task.route.js";
 import userRouter from "./routes/user.route.js";
 
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 8080;
 
 
 app.use(express.json());
+app.use(cookieParser());
 
 
 app.use("/tasks", taskRouter);

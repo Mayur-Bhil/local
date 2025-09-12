@@ -1,5 +1,8 @@
 import User from "../model/user.model.js";
 import jwt from "jsonwebtoken"
+
+
+
 export const createUserController = async (req,res)=>{
     try {
         const {name,email,password} = req.body;
@@ -72,15 +75,22 @@ export const signinUser = async(req,res)=>{
         },
             process.env.JWT_SECRET_KEY
         )
-    return res.json({   
-        message:"signup successFully",
-        user:{
-            email: email,
-            password: password,
-            jwt : jwtToken
-        },
-        success:true,
-        error:false
+        const cookieOptions={
+            httponly:true,
+            secure:true,
+            samesite:"None"
+        }
+        res.cookie("token",jwtToken,cookieOptions)
+        
+        return res.json({   
+            message:"signup successFully",
+            user:{
+                email: email,
+                password: password,
+                jwt : jwtToken
+            },
+            success:true,
+            error:false
 })
         
 } catch (error) {
