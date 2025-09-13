@@ -3,12 +3,12 @@ import Task from "../model/tasks.model.js";
 // Create a new task for authenticated user
 export const createTask = async (req, res) => {
   try {
-    const { title, description, status } = req.body;
+    const { title, description, status ,priority,tags} = req.body;
 
     // Validate required fields
-    if (!title || !description) {
+    if (!title || !description || !priority || !tags ) {
       return res.status(400).json({
-        message: "Title and description are required",
+        message: "enter all required fields",
         success: false,
       });
     }
@@ -22,11 +22,22 @@ export const createTask = async (req, res) => {
       });
     }
 
+    const priorityCanbe = ["low", "medium", "high"]
+
+    if(priority && !priorityCanbe.includes(priority)){
+      return res.status(400).json({
+          message: `Invalid Priority. Valid priorites are: ${priorityCanbe.join(', ')}`,
+          success: false,
+      })
+    }
+
     const payload = {
       title,
       description,
-      status: status || 'pending', // Default to pending if not provided
-      user: req.userId, // This comes from auth middleware
+      status: status || 'pending', 
+      user: req.userId,
+      priority: priority || "medium",
+      tags:tags 
     };
 
     console.log("Creating task payload:", payload);
@@ -35,7 +46,7 @@ export const createTask = async (req, res) => {
     const savedTask = await task.save();
 
     // Populate user info in response
-    await savedTask.populate('user', 'name email');
+    await savedTask.populate('user', 'name email priority tags');
 
     return res.status(201).json({
       message: "Task created successfully",
@@ -57,7 +68,7 @@ export const getAllTasks = async (req, res) => {
   try {
     // Only get tasks for the authenticated user
     const tasks = await Task.find({ user: req.userId })
-      .populate('user', 'name email')
+      .populate('user', 'name email priority tags')
       .sort({ createdAt: -1 }); // Most recent first
 
     return res.status(200).json({
@@ -68,7 +79,7 @@ export const getAllTasks = async (req, res) => {
     });
   } catch (error) {
     console.log("Get All Tasks Error:", error);
-    return res.status(500).json({
+      return res.status(500).json({
       error: error.message,
       message: "Something went wrong while fetching tasks",
       success: false,
@@ -83,7 +94,7 @@ export const getTaskById = async (req, res) => {
 
     // Find task and ensure it belongs to the authenticated user
     const task = await Task.findOne({ _id: id, user: req.userId })
-      .populate('user', 'name email');
+      .populate('user', 'name email priority tags');
 
     if (!task) {
       return res.status(404).json({
@@ -111,7 +122,7 @@ export const getTaskById = async (req, res) => {
 export const updateTaskWithId = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, status } = req.body;
+    const { title, description, status ,priority,tags} = req.body;
 
     // Check if task exists and belongs to user
     const existingTask = await Task.findOne({ _id: id, user: req.userId });
@@ -121,6 +132,15 @@ export const updateTaskWithId = async (req, res) => {
         message: "Task not found or you don't have permission to update it",
         success: false,
       });
+    }
+
+    const priorityCanbe = ["low", "medium", "high"]
+
+    if(priority && !priorityCanbe.includes(priority)){
+      return res.status(400).json({
+          message: `Invalid Priority. Valid priorites are: ${priorityCanbe.join(', ')}`,
+          success: false,
+      })
     }
 
     // Validate status if provided
@@ -137,6 +157,8 @@ export const updateTaskWithId = async (req, res) => {
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;
     if (status !== undefined) updateData.status = status;
+    if(status !== undefined) updateData.priority = priority;
+    if(status !== undefined)updateData.tags= tags;
 
     // If no fields to update
     if (Object.keys(updateData).length === 0) {
@@ -153,7 +175,7 @@ export const updateTaskWithId = async (req, res) => {
         new: true, // Return updated document
         runValidators: true // Run schema validations
       }
-    ).populate('user', 'name email');
+    ).populate('user name email priority tags');
 
     return res.status(200).json({
       message: "Task updated successfully",

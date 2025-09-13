@@ -21,11 +21,11 @@ export const authenticateToken = async (req, res, next) => {
       token = req.headers['x-auth-token'];
     }
 
-    // Debug: Log what we received
-    console.log('Auth Debug Info:');
-    console.log('Authorization header:', authHeader);
-    console.log('Cookies:', req.cookies);
-    console.log('Token extracted:', token ? 'Token found' : 'No token');
+    // // Debug: Log what we received
+    // console.log('Auth Debug Info:');
+    // console.log('Authorization header:', authHeader);
+    // console.log('Cookies:', req.cookies);
+    // console.log('Token extracted:', token ? 'Token found' : 'No token');
 
     if (!token) {
       return res.status(401).json({

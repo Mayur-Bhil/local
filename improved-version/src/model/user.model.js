@@ -15,10 +15,18 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     minlength: [6, "Password must be at least 6 characters long"],
+  },
+  PhotoUrl:{
+    type:String,
+    required:false
   }
+},{
+  timestamps:true
 });
 
 UserSchema.index({ name: 1 });
+
+
 
 UserSchema.methods.validatePassword = async function (password) {
   const user = this;

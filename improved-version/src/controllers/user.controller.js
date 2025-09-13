@@ -4,12 +4,12 @@ import jwt from "jsonwebtoken";
 // Create/Register User (Signup)
 export const createUserController = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password ,PhotoUrl} = req.body;
 
     // Input validation
-    if (!name || !email || !password) {
+    if (!name || !email || !password || PhotoUrl) {
       return res.status(400).json({
-        message: "All fields (name, email, password) are required",
+        message: "All fields (name, email, password ) are required",
         success: false,
         error: true
       });
@@ -49,7 +49,8 @@ export const createUserController = async (req, res) => {
     const newUser = await User.create({
       name: name,
       email: email,
-      password: password
+      password: password,
+      PhotoUrl:PhotoUrl
     });
 
     // Remove password from response for security
@@ -57,6 +58,7 @@ export const createUserController = async (req, res) => {
       _id: newUser._id,
       name: newUser.name,
       email: newUser.email,
+      PhotoUrl:newUser.PhotoUrl,
       createdAt: newUser.createdAt
     };
 
@@ -69,16 +71,6 @@ export const createUserController = async (req, res) => {
 
   } catch (error) {
     console.log("Create User Error:", error);
-    
-    // Handle duplicate key error (if unique index fails)
-    if (error.code === 11000) {
-      return res.status(409).json({
-        message: "Email already exists",
-        success: false,
-        error: true
-      });
-    }
-
     return res.status(500).json({
       error: error.message,
       message: "Something went wrong while creating user",
@@ -104,7 +96,7 @@ export const signinUser = async (req, res) => {
 
     if (!password) {
       return res.status(400).json({
-        message: "Password is required", // Fixed typo: was "Enter Email"
+        message: "Password is required",
         success: false,
         error: true
       });
@@ -126,29 +118,29 @@ export const signinUser = async (req, res) => {
     const isPasswordValid = await user.validatePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
-        message: "Invalid credentials", // Don't specify which field is wrong for security
+        message: "Invalid credentials",
         success: false,
         error: true
       });
     }
 
-    // Generate JWT token - Fixed: should use userId, not _id
+    
     const jwtToken = jwt.sign(
       { 
-        userId: user._id, // Changed from _id to userId for consistency
+        userId: user._id, 
         email: user.email 
       },
-      process.env.JWT_SECRET, // Fixed: should be JWT_SECRET, not JWT_SECRET_KEY
+      process.env.JWT_SECRET,
       { 
-        expiresIn: '24h' // Add token expiration
+        expiresIn: '24h'
       }
     );
 
     // Cookie options
     const cookieOptions = {
-      httpOnly: true, // Fixed: was "httponly"
-      secure: process.env.NODE_ENV === 'production', // Only secure in production
-      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Adjust based on environment
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     };
 
@@ -164,9 +156,9 @@ export const signinUser = async (req, res) => {
     };
 
     return res.status(200).json({
-      message: "Login successful", // Fixed: was "signup successFully"
-      user: userResponse, // Don't send password in response
-      token: jwtToken, // Include token in response for frontend
+      message: "Login successful",
+      user: userResponse, 
+      token: jwtToken,
       success: true,
       error: false
     });
@@ -186,7 +178,6 @@ export const signinUser = async (req, res) => {
 // Get User Profile (for authenticated user)
 export const getUserProfile = async (req, res) => {
   try {
-    // req.userId comes from authentication middleware
     const user = await User.findById(req.userId).select('-password');
     
     if (!user) {
@@ -247,7 +238,7 @@ export const logoutUser = async (req, res) => {
 // Update User Profile
 export const updateUserProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email,PhotoUrl } = req.body;
     const userId = req.userId;
 
     // Build update object
@@ -268,6 +259,7 @@ export const updateUserProfile = async (req, res) => {
         });
       }
       updateData.email = email;
+      updateData.PhotoUrl = PhotoUrl;
     }
 
     // Update user
